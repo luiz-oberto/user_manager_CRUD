@@ -136,6 +136,8 @@ celerybeat.pid
 
 # Environments
 .env
+#.env-devenv
+
 .envrc
 .venv
 env/
@@ -207,3 +209,4 @@ marimo/_lsp/
 __marimo__/
 
 scripts SQL uteis.sql
+notes.md
