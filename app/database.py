@@ -10,3 +10,5 @@ def get_connection():
         password=os.getenv("DB_PASSWORD"),
         cursor_factory=RealDictCursor
     )
+
+
