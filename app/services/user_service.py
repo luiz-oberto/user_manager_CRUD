@@ -1,31 +1,40 @@
 from app.database import get_connection
+from psycopg2.errors import UniqueViolation
+from fastapi import HTTPException
 from werkzeug.security import generate_password_hash
 
+# create de usuário com tratamento de email duplicado
 def create_user(user):
     conn = get_connection()
     cur = conn.cursor()
 
     senha_hash = generate_password_hash(user.senha)
+    email = user.email.lower().strip()
 
-    query = """
-        INSERT INTO usuario (nome, email, senha_hash, is_superuser)
-        VALUES (%s, %s, %s, %s)
-        RETURNING id_usuario, nome, email, is_superuser
-    """
+    try:
+        cur.execute(
+            """
+            INSERT INTO usuario (nome, email, senha_hash, is_superuser)
+            VALUES (%s, %s, %s, %s)
+            RETURNING id_usuario, nome, email, is_superuser
+            """,
+            (user.nome, email, senha_hash, user.is_superuser)
+        )
 
-    cur.execute(query, (
-        user.nome,
-        user.email,
-        senha_hash,
-        user.is_superuser
-    ))
+        result = cur.fetchone()
+        conn.commit()
+        return result
 
-    result = cur.fetchone()
-    conn.commit()
-    cur.close()
-    conn.close()
+    except UniqueViolation:
+        conn.rollback()
+        raise HTTPException(
+            status_code=409,
+            detail="Email já cadastrado"
+        )
 
-    return result
+    finally:
+        cur.close()
+        conn.close()
 
 
 def list_users():
@@ -62,32 +71,45 @@ def get_user_by_id(user_id: int):
 
     return user
 
+# update de usuário com tratamente de emails duplicados
 def update_user(user_id: int, user):
     conn = get_connection()
     cur = conn.cursor()
 
-    query = """
-        UPDATE usuario
-        SET nome = COALESCE(%s, nome),
-            email = COALESCE(%s, email),
-            is_superuser = COALESCE(%s, is_superuser)
-        WHERE id_usuario = %s
-        RETURNING id_usuario, nome, email, is_superuser
-    """
+    email = user.email.lower().strip() if user.email else None
 
-    cur.execute(query, (
-        user.nome,
-        user.email,
-        user.is_superuser,
-        user_id
-    ))
+    try:
+        query = """
+            UPDATE usuario
+            SET nome = COALESCE(%s, nome),
+                email = COALESCE(%s, email),
+                is_superuser = COALESCE(%s, is_superuser)
+            WHERE id_usuario = %s
+            RETURNING id_usuario, nome, email, is_superuser
+        """
 
-    updated_user = cur.fetchone()
-    conn.commit()
-    cur.close()
-    conn.close()
+        cur.execute(query, (
+            user.nome,
+            email,
+            user.is_superuser,
+            user_id
+        ))
 
-    return updated_user
+        updated_user = cur.fetchone()
+        conn.commit()
+
+        return updated_user
+
+    except UniqueViolation:
+        conn.rollback()
+        raise HTTPException(
+            status_code=409,
+            detail="Email já cadastrado por outro usuário"
+        )
+
+    finally:
+        cur.close()
+        conn.close()
 
 def delete_user(user_id: int):
     conn = get_connection()

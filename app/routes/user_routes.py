@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, HTTPException
 from app.schemas.user_schema import UserCreate, UserResponse, UserUpdate
-from app.services.user_service import create_user, list_users, get_user_by_id, update_user
+from app.services.user_service import create_user, list_users, get_user_by_id, update_user, delete_user
 from typing import List
 
 # Defini as rotas explicitamente
@@ -37,9 +37,6 @@ def update(user_id: int, user: UserUpdate):
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
     return updated
-
-from fastapi import status
-from app.services.user_service import delete_user
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
