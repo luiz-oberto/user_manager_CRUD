@@ -13,3 +13,8 @@ class UserResponse(BaseModel):
     nome: str
     email: EmailStr
     is_superuser: bool
+
+class UserUpdate(BaseModel):
+    nome: Optional[str]
+    email: Optional[EmailStr]
+    is_superuser: Optional[bool]

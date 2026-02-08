@@ -42,3 +42,69 @@ def list_users():
     conn.close()
 
     return users
+
+def get_user_by_id(user_id: int):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        SELECT id_usuario, nome, email, is_superuser
+        FROM usuario
+        WHERE id_usuario = %s
+        """,
+        (user_id,)
+    )
+
+    user = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    return user
+
+def update_user(user_id: int, user):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    query = """
+        UPDATE usuario
+        SET nome = COALESCE(%s, nome),
+            email = COALESCE(%s, email),
+            is_superuser = COALESCE(%s, is_superuser)
+        WHERE id_usuario = %s
+        RETURNING id_usuario, nome, email, is_superuser
+    """
+
+    cur.execute(query, (
+        user.nome,
+        user.email,
+        user.is_superuser,
+        user_id
+    ))
+
+    updated_user = cur.fetchone()
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return updated_user
+
+def delete_user(user_id: int):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        DELETE FROM usuario
+        WHERE id_usuario = %s
+        RETURNING id_usuario
+        """,
+        (user_id,)
+    )
+
+    deleted = cur.fetchone()
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return deleted
