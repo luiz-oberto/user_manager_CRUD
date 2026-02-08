@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, HTTPException
-from app.schemas.user_schema import UserCreate, UserResponse, UserUpdate
-from app.services.user_service import create_user, list_users, get_user_by_id, update_user, delete_user
+from app.schemas.user_schema import UserCreate, UserResponse, UserUpdate, LoginRequest
+from app.services.user_service import create_user, list_users, get_user_by_id, update_user, delete_user, authenticate_user
 from typing import List
 
 # Defini as rotas explicitamente
@@ -47,3 +47,19 @@ def delete(user_id: int):
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
     return
+
+
+@router.post("/login")
+def login(data: LoginRequest):
+    user = authenticate_user(data.email, data.senha)
+
+    if not user:
+        raise HTTPException(
+            status_code=401,
+            detail="Email ou senha inválidos"
+        )
+
+    return {
+        "message": "Login realizado com sucesso",
+        "user": user
+    }

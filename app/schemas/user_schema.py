@@ -18,3 +18,7 @@ class UserUpdate(BaseModel):
     nome: Optional[str]
     email: Optional[EmailStr]
     is_superuser: Optional[bool]
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    senha: str
