@@ -1,4 +1,5 @@
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, status, HTTPException, Depends
+from app.services.dependencies import get_current_user
 from app.schemas.user_schema import UserCreate, UserResponse, UserUpdate, LoginRequest
 from app.services.user_service import create_user, list_users, get_user_by_id, update_user, delete_user, authenticate_user
 from typing import List
@@ -15,7 +16,7 @@ def create(user: UserCreate):
 
 
 @router.get("/", response_model=List[UserResponse])
-def get_all():
+def get_all(current_user=Depends(get_current_user)): # vai analisar se o token do usuário é valido antes de listar os usuários.
     return list_users()
 
 
@@ -63,3 +64,4 @@ def login(data: LoginRequest):
         "message": "Login realizado com sucesso",
         "user": user
     }
+
