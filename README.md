@@ -3,3 +3,7 @@ Web system for users management that uses API at the backend wrote in python to 
 
 
 ![alt text](image.png)
+
+
+## Inicializando o sistema
+Ao baixar o repositório no seu servidor, antes de tudo, renomeei o arquivo .env.example para .env

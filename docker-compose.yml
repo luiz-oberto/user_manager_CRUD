@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: usermanager_db
+    restart: always
+    environment:
+      POSTGRES_DB: userManager
+      POSTGRES_USER: nevat
+      POSTGRES_PASSWORD: senha_segura_aqui
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  api:
+    build: .
+    container_name: usermanager_api
+    restart: always
+    depends_on:
+      - db
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+
+volumes:
+  postgres_data:
