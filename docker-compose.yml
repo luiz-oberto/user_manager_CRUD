@@ -11,19 +11,29 @@ services:
       POSTGRES_PASSWORD: senha_segura_aqui
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./docker/db_init:/docker-entrypoint-initdb.d # executará scripts dentro do postgres (init.sql)
+    # Remover essa linha em caso de ambiente de produção
     ports:
       - "5432:5432"
+    #####################################################
+    healthcheck: # garante que a API suba apenas quando o banco estiver saudável
+      test: ["CMD-SHELL", "pg_isready -U nevat"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   api:
     build: .
     container_name: usermanager_api
     restart: always
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     env_file:
       - .env
     ports:
       - "8000:8000"
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
 
 volumes:
   postgres_data:
