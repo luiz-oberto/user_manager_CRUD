@@ -269,7 +269,7 @@ docker/
 ## 👨‍💻 Autor
 Desenvolvido por Luiz Oberto Matos Raiol
 
-Engenheiro/Analista de TI com foco em Backend e Segurança da Informação.  
+Analista de TI com foco em Backend e Segurança da Informação.  
 Experiência em desenvolvimento de APIs, automação e infraestrutura.
 
 Este projeto demonstra:
