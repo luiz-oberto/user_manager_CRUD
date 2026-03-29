@@ -29,19 +29,8 @@ API REST desenvolvida em **FastAPI** para gerenciamento de usuários, com autent
 
 ## ⚙️ Pré-requisitos
 
-Antes de iniciar, certifique-se de ter instalado:
-
-* Docker
-* Docker Compose
-
-### 🔹 Instalar Docker (Ubuntu/Debian)
-
-```bash
-sudo apt update && sudo apt upgrade -y
-sudo apt install -y docker.io docker-compose-plugin
-sudo systemctl enable docker
-sudo systemctl start docker
-```
+* Sistema baseado em Linux (Ubuntu recomendado)
+* Git
 
 ---
 
@@ -54,7 +43,41 @@ cd user_manager
 
 ---
 
-## 🔐 Configuração do ambiente
+# 🐳 🔧 Configuração automática do Docker (RECOMENDADO)
+
+Este projeto inclui um script para instalar automaticamente o Docker e o Docker Compose Plugin.
+
+### ▶️ Executar o script
+
+```bash
+chmod +x setup_server.sh
+./setup_server.sh
+```
+
+---
+
+### ⚠️ Após execução
+
+Execute:
+
+```bash
+newgrp docker
+```
+
+Isso permite usar Docker sem `sudo`.
+
+---
+
+### 🔍 Validar instalação
+
+```bash
+docker --version
+docker compose version
+```
+
+---
+
+# 🔐 Configuração do ambiente
 
 Copie o arquivo de exemplo:
 
@@ -62,7 +85,7 @@ Copie o arquivo de exemplo:
 cp .env.example .env
 ```
 
-Edite o arquivo `.env`:
+Edite o arquivo:
 
 ```bash
 nano .env
@@ -74,7 +97,7 @@ Exemplo:
 # DATABASE CONFIG
 DB_HOST=db
 DB_NAME=userManager
-DB_USER=nevat
+DB_USER=YOUR_USER
 DB_PASSWORD=senha_segura_aqui
 
 # JWT CONFIG
@@ -85,13 +108,15 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 
 ---
 
-## 🐳 Subindo a aplicação com Docker
+# 🐳 Subindo a aplicação
 
 ```bash
 docker compose up --build -d
 ```
 
-### 🔍 Ver containers ativos:
+---
+
+### 🔍 Ver containers ativos
 
 ```bash
 docker ps
@@ -99,7 +124,7 @@ docker ps
 
 ---
 
-## 🌐 Acessando a API
+# 🌐 Acessando a API
 
 Abra no navegador:
 
@@ -107,13 +132,11 @@ Abra no navegador:
 http://localhost:8000/docs
 ```
 
-Interface interativa do Swagger será exibida.
-
 ---
 
-## 🔐 Autenticação
+# 🔐 Autenticação
 
-### 🔹 Obter token
+## 🔹 Obter token
 
 Endpoint:
 
@@ -121,7 +144,7 @@ Endpoint:
 POST /token
 ```
 
-Tipo de Body: `x-www-form-urlencoded`
+Body: `x-www-form-urlencoded`
 
 ```
 username=email@exemplo.com
@@ -139,9 +162,9 @@ Resposta:
 
 ---
 
-### 🔹 Usar token
+## 🔹 Usar token
 
-Adicionar no header:
+Header:
 
 ```
 Authorization: Bearer TOKEN_JWT
@@ -149,9 +172,9 @@ Authorization: Bearer TOKEN_JWT
 
 ---
 
-## 🧪 Testando a API
+# 🧪 Testando a API
 
-### 🔹 Criar usuário (apenas superuser)
+### Criar usuário (superuser)
 
 ```
 POST /users
@@ -159,7 +182,7 @@ POST /users
 
 ---
 
-### 🔹 Listar usuários (apenas superuser)
+### Listar usuários (superuser)
 
 ```
 GET /users
@@ -167,7 +190,7 @@ GET /users
 
 ---
 
-### 🔹 Buscar usuário por ID
+### Buscar usuário
 
 ```
 GET /users/{id}
@@ -175,7 +198,7 @@ GET /users/{id}
 
 ---
 
-### 🔹 Atualizar usuário
+### Atualizar usuário
 
 ```
 PUT /users/{id}
@@ -183,7 +206,7 @@ PUT /users/{id}
 
 ---
 
-### 🔹 Deletar usuário
+### Deletar usuário
 
 ```
 DELETE /users/{id}
@@ -191,28 +214,28 @@ DELETE /users/{id}
 
 ---
 
-## 🛂 Controle de permissões
+# 🛂 Controle de permissões
 
-| Tipo de usuário | Permissões                               |
-| --------------- | ---------------------------------------- |
-| Usuário comum   | Ver próprio perfil                       |
-| Superusuário    | Criar, listar, editar e remover usuários |
+| Tipo          | Permissões                |
+| ------------- | ------------------------- |
+| Usuário comum | Visualizar próprio perfil |
+| Superusuário  | Gerenciar usuários        |
 
 ---
 
-## 💾 Persistência de dados
+# 💾 Persistência de dados
 
-O banco de dados utiliza volume Docker:
+A aplicação utiliza volume Docker:
 
 ```
 postgres_data
 ```
 
-Isso garante que os dados não sejam perdidos ao reiniciar os containers.
+Os dados permanecem mesmo após reinicialização.
 
 ---
 
-## 🔄 Reiniciar a aplicação
+# 🔄 Reiniciar aplicação
 
 ```bash
 docker compose down
@@ -221,18 +244,16 @@ docker compose up -d
 
 ---
 
-## 🧹 Resetar completamente o ambiente
+# 🧹 Reset completo (apaga banco)
 
 ```bash
 docker compose down -v
 docker compose up --build
 ```
 
-⚠️ Isso apagará todos os dados do banco.
-
 ---
 
-## 🧠 Estrutura do projeto
+# 🧠 Estrutura do projeto
 
 ```
 app/
@@ -249,20 +270,20 @@ docker/
 
 ---
 
-## 📌 Observações
+# 📌 Observações
 
-* O banco de dados é inicializado automaticamente na primeira execução
-* O token JWT possui expiração configurável
-* A aplicação segue arquitetura stateless
+* O banco é inicializado automaticamente na primeira execução
+* JWT possui expiração configurável
+* Arquitetura stateless
 
 ---
 
-## 🚀 Próximos passos
+# 🚀 Próximos passos
 
-* Implementação de refresh token
-* Deploy em VPS com Nginx
-* HTTPS com Let's Encrypt
-* Frontend web
+* Refresh token
+* Deploy com Nginx
+* HTTPS
+* Frontend
 
 ---
 
