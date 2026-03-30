@@ -29,7 +29,7 @@ API REST desenvolvida em **FastAPI** para gerenciamento de usuários, com autent
 
 ## ⚙️ Pré-requisitos
 
-* Sistema baseado em Linux (Ubuntu recomendado)
+* Sistema operacional Linux (Ubuntu recomendado)
 * Git
 
 ---
@@ -77,60 +77,83 @@ docker compose version
 
 ---
 
-# 🔐 Configuração do ambiente
+## ⚙️ Configuração de Variáveis de Ambiente
 
-Copie o arquivo de exemplo:
+Este projeto utiliza variáveis de ambiente para configuração da aplicação.
+
+### 📁 1. Criar o arquivo `.env`
+
+Antes de executar o projeto, copie o arquivo de exemplo:
 
 ```bash
 cp .env.example .env
 ```
 
-Edite o arquivo:
+---
+
+### ✏️ 2. Preencher as variáveis
+
+Edite o arquivo `.env` com valores reais:
+
+#### 🔹 Banco de Dados
+
+* `DB_HOST` → Host do banco (em Docker: `db`)
+* `DB_NAME` → Nome do banco de dados
+* `DB_USER` → Usuário do banco
+* `DB_PASSWORD` → Senha do banco
+
+#### 🔹 Autenticação (JWT)
+
+* `SECRET_KEY` → Chave secreta para geração dos tokens (use uma chave forte)
+* `ALGORITHM` → Algoritmo de assinatura (ex: `HS256`)
+* `ACCESS_TOKEN_EXPIRE_MINUTES` → Tempo de expiração do token
+
+#### 🔹 Usuário Administrador (Bootstrap automático)
+
+* `ADMIN_EMAIL` → Email do superusuário inicial
+* `ADMIN_PASSWORD` → Senha do superusuário inicial
+
+> ⚠️ Caso essas variáveis não sejam definidas, a aplicação utilizará valores padrão (somente para desenvolvimento).
+
+---
+
+### 🔐 Gerando uma SECRET_KEY segura
+
+Execute:
 
 ```bash
-nano .env
-```
-
-Exemplo:
-
-```env
-# DATABASE CONFIG
-DB_HOST=db
-DB_NAME=userManager
-DB_USER=YOUR_USER
-DB_PASSWORD=senha_segura_aqui
-
-# JWT CONFIG
-SECRET_KEY=sua_chave_super_secreta
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
+openssl rand -hex 32
 ```
 
 ---
 
-# 🐳 Subindo a aplicação
+### 🐳 Observação (Docker)
 
-```bash
-docker compose up --build -d
-```
-
----
-
-### 🔍 Ver containers ativos
-
-```bash
-docker ps
-```
+* O serviço da API lê automaticamente o arquivo `.env`
+* Certifique-se de que as credenciais do banco (`DB_USER` e `DB_PASSWORD`) estão alinhadas com o `docker-compose.yml`
 
 ---
 
-# 🌐 Acessando a API
+### 🚀 Inicialização
 
-Abra no navegador:
+Após configurar o `.env`, execute:
 
+```bash
+docker compose up --build
 ```
-http://localhost:8000/docs
-```
+
+A aplicação irá:
+
+1. Subir o banco PostgreSQL
+2. Iniciar a API FastAPI
+3. Criar automaticamente um superusuário (caso ainda não exista)
+
+---
+
+### 🔍 Acesso à API
+
+* Documentação interativa:
+  http://IP_DA_MAQUINA:8000/docs
 
 ---
 
@@ -147,7 +170,7 @@ POST /token
 Body: `x-www-form-urlencoded`
 
 ```
-username=email@exemplo.com
+username=Nome
 password=senha
 ```
 
@@ -169,11 +192,21 @@ Header:
 ```
 Authorization: Bearer TOKEN_JWT
 ```
+---
+# 🔄 Fluxo de uso da API
+
+1. A aplicação inicia e cria automaticamente um superusuário (caso não exista)
+2. O usuário realiza autenticação via `/token`
+3. Um token JWT é retornado
+4. O token é utilizado para acessar endpoints protegidos
+5. O superusuário pode gerenciar usuários no sistema
 
 ---
 
 # 🧪 Testando a API
-
+> 🔐 Todos os endpoints protegidos requerem token JWT no header:
+>
+> Authorization: Bearer <seu_token>
 ### Criar usuário (superuser)
 
 ```
@@ -212,6 +245,13 @@ PUT /users/{id}
 DELETE /users/{id}
 ```
 
+### Exemplo de login via curl
+
+```bash
+curl -X POST "http://localhost:8000/token" \
+-H "Content-Type: application/x-www-form-urlencoded" \
+-d "username=api_admin@local&password=suaSenha"
+```
 ---
 
 # 🛂 Controle de permissões
@@ -260,6 +300,7 @@ app/
 ├── routes/
 ├── services/
 ├── schemas/
+├── utils/
 ├── database.py
 ├── main.py
 
@@ -267,7 +308,14 @@ docker/
 └── db_init/
     └── init.sql
 ```
+---
+# 🔒 Segurança
 
+- Senhas armazenadas com hash (bcrypt)
+- Autenticação baseada em JWT
+- Controle de acesso por nível de usuário
+- Variáveis sensíveis protegidas via `.env`
+- `.env` não versionado
 ---
 
 # 📌 Observações
@@ -280,10 +328,11 @@ docker/
 
 # 🚀 Próximos passos
 
-* Refresh token
-* Deploy com Nginx
-* HTTPS
-* Frontend
+* Implementação de refresh token
+* Deploy com Nginx e reverse proxy
+* Configuração de HTTPS (TLS)
+* Integração com frontend
+* Controle de roles mais granular (RBAC)
 
 ---
 

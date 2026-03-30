@@ -7,17 +7,15 @@ services:
     restart: always
     environment:
       POSTGRES_DB: userManager
-      POSTGRES_USER: nevat
-      POSTGRES_PASSWORD: senha_segura_aqui
+      POSTGRES_USER: bd_admin
+      POSTGRES_PASSWORD: your_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./docker/db_init:/docker-entrypoint-initdb.d # executará scripts dentro do postgres (init.sql)
-    # Remover essa linha em caso de ambiente de produção
+      - ./docker/db_init:/docker-entrypoint-initdb.d
     ports:
-      - "5432:5432"
-    #####################################################
-    healthcheck: # garante que a API suba apenas quando o banco estiver saudável
-      test: ["CMD-SHELL", "pg_isready -U nevat"]
+      - "5432:5432" # remover em produção <---
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bd_admin"]
       interval: 5s
       timeout: 5s
       retries: 5
