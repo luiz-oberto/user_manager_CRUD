@@ -37,7 +37,7 @@ API REST desenvolvida em **FastAPI** para gerenciamento de usuários, com autent
 ## 📁 Clonando o projeto
 
 ```bash
-git clone https://github.com/seu-usuario/user_manager.git
+git clone https://github.com/seu-usuario/user_manager_CRUD.git
 cd user_manager
 ```
 
