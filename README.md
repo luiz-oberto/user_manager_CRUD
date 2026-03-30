@@ -250,7 +250,7 @@ DELETE /users/{id}
 ```bash
 curl -X POST "http://localhost:8000/token" \
 -H "Content-Type: application/x-www-form-urlencoded" \
--d "username=api_admin@local&password=suaSenha"
+-d "username=admin@local&password=Admin@123"
 ```
 ---
 

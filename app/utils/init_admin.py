@@ -1,9 +1,7 @@
 from app.database import get_connection
-from passlib.context import CryptContext
+from werkzeug.security import generate_password_hash
+
 import os
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 
 def create_initial_admin():
     conn = get_connection()
@@ -23,7 +21,7 @@ def create_initial_admin():
         return
 
     # Cria hash
-    hashed_password = pwd_context.hash(admin_password)
+    hashed_password = generate_password_hash(admin_password)
 
     # Cria usuário admin
     cur.execute("""
