@@ -50,7 +50,7 @@ Este projeto inclui um script para instalar automaticamente o Docker e o Docker 
 ### ▶️ Executar o script
 
 ```bash
-chmod +x setup_server.sh
+chmod +x setup_server_docker.sh
 ./setup_server.sh
 ```
 

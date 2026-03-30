@@ -15,7 +15,7 @@ services:
     ports:
       - "5432:5432" # remover em produção <---
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U bd_admin"]
+      test: ["CMD-SHELL", "pg_isready -U bd_admin -d userManager"]
       interval: 5s
       timeout: 5s
       retries: 5
